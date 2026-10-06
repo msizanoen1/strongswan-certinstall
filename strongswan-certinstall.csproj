@@ -6,6 +6,7 @@
     <RootNamespace>strongswan_certinstall</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PublishAot>true</PublishAot>
   </PropertyGroup>
 
 </Project>
