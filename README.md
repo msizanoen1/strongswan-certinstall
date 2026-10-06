@@ -1,6 +1,6 @@
 # About this program
 
-Unpacks the contents of a PKCS #12 file (certificates and private keys) and automatically place them at the correct position for use with the StrongSwan NetworkManager plugin on Fedora.
+Unpacks the contents of a PKCS #12 file (certificates and private keys) and automatically place them at the correct place for use with the StrongSwan NetworkManager plugin on Fedora.
 
 This tool is intended specifically for use with the StrongSwan NetworkManager plugin on Fedora only - other configurations and distributions are not supported.
 
