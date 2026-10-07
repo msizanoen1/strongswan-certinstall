@@ -35,7 +35,7 @@ var certificateCollection = X509CertificateLoader.LoadPkcs12CollectionFromFile(f
 
 foreach (var caCertificate in certificateCollection.Where(x => !x.HasPrivateKey))
 {
-    var destinationPath = $"/etc/strongswan/ipsec.d/cacerts/{caCertificate.SubjectName.Format(false)}.pem";
+    var destinationPath = $"/etc/strongswan/ipsec.d/cacerts/{caCertificate.SubjectName.Name}.pem";
     using (var certFile = File.CreateText(destinationPath))
     {
         certFile.Write(caCertificate.ExportCertificatePem());
@@ -45,8 +45,8 @@ foreach (var caCertificate in certificateCollection.Where(x => !x.HasPrivateKey)
 
 foreach (var clientCertificate in certificateCollection.Where(x => x.HasPrivateKey))
 {
-    var destinationCertPath = $"/etc/strongswan/ipsec.d/certs/{clientCertificate.SubjectName.Format(false)}.pem";
-    var destinationKeyPath = $"/etc/strongswan/ipsec.d/private/{clientCertificate.SubjectName.Format(false)}.pem";
+    var destinationCertPath = $"/etc/strongswan/ipsec.d/certs/{clientCertificate.SubjectName.Name}.pem";
+    var destinationKeyPath = $"/etc/strongswan/ipsec.d/private/{clientCertificate.SubjectName.Name}.pem";
     using (var certFile = File.CreateText(destinationCertPath))
     {
         certFile.Write(clientCertificate.ExportCertificatePem());
