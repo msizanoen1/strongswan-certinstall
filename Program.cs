@@ -72,19 +72,13 @@ foreach (var clientCertificate in certificateCollection.Where(x => x.HasPrivateK
 }
 
 AddPermissions(installBasePath,
-    UnixFileMode.UserRead | UnixFileMode.UserExecute |
-    UnixFileMode.GroupRead | UnixFileMode.GroupExecute |
-    UnixFileMode.OtherRead | UnixFileMode.OtherExecute);
+    UnixFileMode.UserExecute | UnixFileMode.GroupExecute | UnixFileMode.OtherExecute);
 
 AddPermissions(installCertPath,
-    UnixFileMode.UserRead | UnixFileMode.UserExecute |
-    UnixFileMode.GroupRead | UnixFileMode.GroupExecute |
-    UnixFileMode.OtherRead | UnixFileMode.OtherExecute);
+    UnixFileMode.UserRead | UnixFileMode.GroupRead | UnixFileMode.OtherRead);
 
 AddPermissions(installKeyPath,
-    UnixFileMode.UserRead | UnixFileMode.UserExecute |
-    UnixFileMode.GroupRead | UnixFileMode.GroupExecute |
-    UnixFileMode.OtherRead | UnixFileMode.OtherExecute);
+    UnixFileMode.UserRead | UnixFileMode.GroupRead | UnixFileMode.OtherRead);
 
 return 0;
 
