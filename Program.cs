@@ -65,7 +65,6 @@ foreach (var clientCertificate in certificateCollection.Where(x => x.HasPrivateK
     Console.WriteLine($"Installed client certificate {destinationCertPath}");
     using (var keyFile = File.CreateText(destinationKeyPath))
     {
-        File.SetUnixFileMode(destinationKeyPath, UnixFileMode.UserRead);
         keyFile.Write(GetPrivateKeyPem(clientCertificate));
     }
     Console.WriteLine($"Installed client key {destinationKeyPath}");
