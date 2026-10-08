@@ -6,6 +6,17 @@ if (args is not [var filePath])
     return 1;
 }
 
+var installBasePath = "/etc/strongswan/ipsec.d";
+var installCaPath = "/etc/strongswan/ipsec.d/cacerts";
+var installCertPath = "/etc/strongswan/ipsec.d/certs";
+var installKeyPath = "/etc/strongswan/ipsec.d/private";
+
+if (!Directory.Exists(installBasePath))
+{
+    Console.WriteLine("Unsupported distribution");
+    return 1;
+}
+
 Console.Write("Enter PKCS #12 Password: ");
 
 var password = "";
@@ -35,7 +46,7 @@ var certificateCollection = X509CertificateLoader.LoadPkcs12CollectionFromFile(f
 
 foreach (var caCertificate in certificateCollection.Where(x => !x.HasPrivateKey))
 {
-    var destinationPath = $"/etc/strongswan/ipsec.d/cacerts/{caCertificate.SubjectName.Name}.pem";
+    var destinationPath = Path.Join(installCaPath, $"{caCertificate.SubjectName.Name}.pem");
     using (var certFile = File.CreateText(destinationPath))
     {
         certFile.Write(caCertificate.ExportCertificatePem());
@@ -45,8 +56,8 @@ foreach (var caCertificate in certificateCollection.Where(x => !x.HasPrivateKey)
 
 foreach (var clientCertificate in certificateCollection.Where(x => x.HasPrivateKey))
 {
-    var destinationCertPath = $"/etc/strongswan/ipsec.d/certs/{clientCertificate.SubjectName.Name}.pem";
-    var destinationKeyPath = $"/etc/strongswan/ipsec.d/private/{clientCertificate.SubjectName.Name}.pem";
+    var destinationCertPath = Path.Join(installCertPath, $"{clientCertificate.SubjectName.Name}.pem");
+    var destinationKeyPath = Path.Join(installKeyPath, $"{clientCertificate.SubjectName.Name}.pem");
     using (var certFile = File.CreateText(destinationCertPath))
     {
         certFile.Write(clientCertificate.ExportCertificatePem());
@@ -54,10 +65,26 @@ foreach (var clientCertificate in certificateCollection.Where(x => x.HasPrivateK
     Console.WriteLine($"Installed client certificate {destinationCertPath}");
     using (var keyFile = File.CreateText(destinationKeyPath))
     {
+        File.SetUnixFileMode(destinationKeyPath, UnixFileMode.UserRead);
         keyFile.Write(GetPrivateKeyPem(clientCertificate));
     }
     Console.WriteLine($"Installed client key {destinationKeyPath}");
 }
+
+AddPermissions(installBasePath,
+    UnixFileMode.UserRead | UnixFileMode.UserExecute |
+    UnixFileMode.GroupRead | UnixFileMode.GroupExecute |
+    UnixFileMode.OtherRead | UnixFileMode.OtherExecute);
+
+AddPermissions(installCertPath,
+    UnixFileMode.UserRead | UnixFileMode.UserExecute |
+    UnixFileMode.GroupRead | UnixFileMode.GroupExecute |
+    UnixFileMode.OtherRead | UnixFileMode.OtherExecute);
+
+AddPermissions(installKeyPath,
+    UnixFileMode.UserRead | UnixFileMode.UserExecute |
+    UnixFileMode.GroupRead | UnixFileMode.GroupExecute |
+    UnixFileMode.OtherRead | UnixFileMode.OtherExecute);
 
 return 0;
 
@@ -80,4 +107,9 @@ static string GetPrivateKeyPem(X509Certificate2 certificate)
         return ecdhPrivateKey.ExportPkcs8PrivateKeyPem();
     }
     throw new NotSupportedException("Unknown private key algorithm");
+}
+
+static void AddPermissions(string path, UnixFileMode newPermissions)
+{
+    File.SetUnixFileMode(path, File.GetUnixFileMode(path) | newPermissions);
 }
